@@ -55,6 +55,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(80px, 140px));
       gap: 8px;
+      column-gap: 16px;
       margin-bottom: 20px;
       width: 100%;
       max-width: 420px;
@@ -167,18 +168,19 @@
       text-shadow: 0 0 6px #ffd700cc;
     }
 
-    /* ✅ Responsivo: abaixo de 768px coloca em coluna */
-    @media (max-width: 768px) {
+
+    @media (max-width: 1024px) {
       .container {
         flex-direction: column;
-        /* scoreboard vai para baixo do jogo */
+        gap: 20px;
         align-items: center;
       }
+    }
 
-      #board {
-        grid-template-columns: repeat(3, minmax(60px, 25vw));
-        max-width: 90vw;
-      }
+    #board {
+      grid-template-columns: repeat(3, minmax(60px, 25vw));
+      max-width: 90vw;
+    }
     }
   </style>
 </head>
