@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- ✅ responsividade -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jogo da Velha com Ranking</title>
   <script defer src="jogoDaVelha.js"></script>
   <style>
@@ -21,12 +21,13 @@
 
     .container {
       display: flex;
-      flex-wrap: wrap;
-      /* ✅ quebra em telas menores */
-      gap: 30px;
+      flex-wrap: nowrap;
+      gap: 40px;
       justify-content: center;
+      align-items: flex-start;
       padding: 20px;
-      max-width: 1000px;
+      max-width: 1200px;
+      width: 100%;
     }
 
     .game-area {
@@ -34,13 +35,11 @@
       flex-direction: column;
       align-items: center;
       flex: 1 1 280px;
-      /* ✅ largura mínima para o jogo */
     }
 
     h1 {
       margin: 0 0 10px;
       font-size: clamp(24px, 5vw, 48px);
-      /* ✅ escala dinâmica */
       text-align: center;
     }
 
@@ -64,7 +63,6 @@
     .cell {
       width: 100%;
       aspect-ratio: 1 / 1;
-      /* ✅ mantém quadrado */
       background: #fff;
       color: #333;
       font-size: clamp(32px, 8vw, 72px);
@@ -127,7 +125,6 @@
       text-shadow: 0 0 6px #ffd700aa;
     }
 
-    /* Tabela do ranking */
     .score-table {
       width: 100%;
       border-collapse: collapse;
@@ -170,15 +167,16 @@
       text-shadow: 0 0 6px #ffd700cc;
     }
 
-    /* ✅ Ajustes responsivos extras */
+    /* ✅ Responsivo: abaixo de 768px coloca em coluna */
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
+        /* scoreboard vai para baixo do jogo */
         align-items: center;
       }
 
       #board {
-        grid-template-columns: repeat(3, 30vw);
+        grid-template-columns: repeat(3, minmax(60px, 25vw));
         max-width: 90vw;
       }
     }
