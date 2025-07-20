@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- ✅ responsividade -->
   <title>Jogo da Velha com Ranking</title>
   <script defer src="jogoDaVelha.js"></script>
   <style>
@@ -12,7 +13,7 @@
       color: #fff;
       margin: 0;
       padding: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -20,41 +21,53 @@
 
     .container {
       display: flex;
-      gap: 40px;
-      align-items: center;
+      flex-wrap: wrap;
+      /* ✅ quebra em telas menores */
+      gap: 30px;
+      justify-content: center;
+      padding: 20px;
+      max-width: 1000px;
     }
 
     .game-area {
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex: 1 1 280px;
+      /* ✅ largura mínima para o jogo */
     }
 
     h1 {
       margin: 0 0 10px;
-      font-size: 48px;
+      font-size: clamp(24px, 5vw, 48px);
+      /* ✅ escala dinâmica */
+      text-align: center;
     }
 
     #aviso {
       margin-bottom: 20px;
-      font-size: 22px;
+      font-size: clamp(16px, 3vw, 22px);
       font-weight: bold;
       color: #333a;
+      text-align: center;
     }
 
     #board {
       display: grid;
-      grid-template-columns: repeat(3, 140px);
+      grid-template-columns: repeat(3, minmax(80px, 140px));
       gap: 8px;
       margin-bottom: 20px;
+      width: 100%;
+      max-width: 420px;
     }
 
     .cell {
-      width: 140px;
-      height: 140px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      /* ✅ mantém quadrado */
       background: #fff;
       color: #333;
-      font-size: 72px;
+      font-size: clamp(32px, 8vw, 72px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -71,7 +84,7 @@
 
     button {
       padding: 12px 24px;
-      font-size: 20px;
+      font-size: clamp(14px, 2.5vw, 20px);
       border: none;
       border-radius: 5px;
       background: #ff9800;
@@ -85,8 +98,15 @@
       background: #e68900;
     }
 
+    #jogadoresAtuais {
+      margin-top: 10px;
+      font-size: clamp(16px, 3vw, 20px);
+      font-weight: bold;
+      text-align: center;
+    }
+
     .scoreboard {
-      min-width: 320px;
+      min-width: 280px;
       background: rgba(255, 255, 255, 0.15);
       padding: 20px;
       border-radius: 8px;
@@ -96,11 +116,12 @@
       align-items: stretch;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #fff;
+      flex: 1 1 280px;
     }
 
     .scoreboard h2 {
       text-align: center;
-      font-size: 32px;
+      font-size: clamp(20px, 4vw, 32px);
       margin-bottom: 15px;
       color: #ffd700;
       text-shadow: 0 0 6px #ffd700aa;
@@ -110,6 +131,7 @@
     .score-table {
       width: 100%;
       border-collapse: collapse;
+      font-size: clamp(12px, 2vw, 16px);
     }
 
     .score-table thead tr {
@@ -118,7 +140,7 @@
 
     .score-table th,
     .score-table td {
-      padding: 10px 8px;
+      padding: 8px 4px;
       border: 1px solid #555;
       text-align: center;
       font-weight: 600;
@@ -126,7 +148,6 @@
 
     .score-table th {
       background: #444;
-      font-size: 18px;
     }
 
     .score-table tbody tr:hover {
@@ -140,14 +161,26 @@
       background: rgba(255, 215, 0, 0.15);
     }
 
-    /* Info do líder */
     #leader-info {
       margin-bottom: 12px;
-      font-size: 18px;
+      font-size: clamp(14px, 2vw, 18px);
       font-weight: bold;
       text-align: center;
       color: #ffd700;
       text-shadow: 0 0 6px #ffd700cc;
+    }
+
+    /* ✅ Ajustes responsivos extras */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #board {
+        grid-template-columns: repeat(3, 30vw);
+        max-width: 90vw;
+      }
     }
   </style>
 </head>
@@ -159,7 +192,7 @@
       <div id="aviso">Clique em Iniciar</div>
       <div id="board"></div>
       <button id="btnIniciar" onclick="iniciar()">Iniciar / Reiniciar</button>
-      <div id="jogadoresAtuais" style="margin-top:10px; font-size:20px; font-weight:bold;"></div>
+      <div id="jogadoresAtuais"></div>
     </div>
     <div class="scoreboard">
       <h2>🏆 Ranking</h2>
