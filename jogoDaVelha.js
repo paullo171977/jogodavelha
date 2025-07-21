@@ -308,55 +308,76 @@ function iniciarScrollVertical() {
     const tbody = document.querySelector('#ranking-table tbody');
     if (!tbody) return;
 
-    // 🛠️ Duplicar o conteúdo para criar o efeito de rolo infinito
+    // interrompe qualquer animação anterior
+    if (scrollAnimationFrame) {
+        cancelAnimationFrame(scrollAnimationFrame);
+        scrollAnimationFrame = null;
+    }
+
+    // zera offset e pausa
+    scrollOffset = 0;
+    scrollPaused = false;
+    tbody.style.transition = 'none';
+    tbody.style.transform = `translateY(0px)`;
+
     const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // se tiver 5 ou menos jogadores, não faz rolagem
+    if (rows.length <= visibleRows) {
+        return;
+    }
+
+    // limpa duplicatas antigas (caso tenha rodado antes)
+    // mantém apenas as linhas originais:
+    while (tbody.children.length > rows.length) {
+        tbody.removeChild(tbody.lastChild);
+    }
+
+    // duplica as linhas originais uma única vez
     rows.forEach(row => {
         const clone = row.cloneNode(true);
         tbody.appendChild(clone);
     });
 
-    // Iniciar loop de animação
+    const totalHeight = rows.length * rowHeight;
+
+    // função de animação
     function animateScroll() {
         if (!scrollPaused) {
             scrollOffset += scrollSpeed;
             tbody.style.transform = `translateY(-${scrollOffset}px)`;
 
-            // Altura total do bloco original
-            const totalHeight = rows.length * rowHeight;
-
             if (scrollOffset >= totalHeight) {
-                // reinicia o offset quando terminar o ciclo completo
                 scrollOffset = 0;
                 tbody.style.transform = `translateY(0px)`;
 
-                // pausa de 10s quando volta ao início
                 scrollPaused = true;
                 setTimeout(() => {
                     scrollPaused = false;
                 }, pauseTime);
             }
         }
-
         scrollAnimationFrame = requestAnimationFrame(animateScroll);
     }
 
     animateScroll();
 }
 
+
+
 function zerarRanking() {
-    if (confirm("Tem certeza que deseja zerar apenas os pontos do ranking?")) {
-        players.forEach(p => {
-            p.wins = 0;
-            p.draws = 0;
-            p.losses = 0;
-            p.points = 0;
-            p.firstScoreDate = "";
-        });
+    if (confirm("Tem certeza que deseja zerar TODO o ranking (jogadores e pontos)?")) {
+        // limpa completamente o array de jogadores
+        players = [];
 
+        // limpa o líder
         rankingLeader = { name: "", since: "" };
-        salvarRanking();
-        updateScoreboard();
 
+        // salva estado vazio no localStorage
+        salvarRanking();
+
+        // atualiza a tabela e outros elementos
+        updateScoreboard();
         resetBoard();
         updateBoard();
         updateJogadoresAtuais();
@@ -364,3 +385,4 @@ function zerarRanking() {
         updateBotoes();
     }
 }
+
