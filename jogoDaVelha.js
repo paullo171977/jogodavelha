@@ -10,10 +10,10 @@ let rankingInterval = null;
 let rankingScrollOffset = 0;
 let scrollOffset = 0;
 let scrollPaused = false;
-let scrollSpeed = 0.8; // pixels por frame (ajuste para mais rápido ou mais lento)
+let scrollSpeed = 0.8;
 let visibleRows = 5;
-let rowHeight = 35; // altura da linha (ajuste ao seu CSS)
-let pauseTime = 5000; // pausa de 10 segundos
+let rowHeight = 35;
+let pauseTime = 5000;
 let scrollAnimationFrame;
 
 window.addEventListener('load', () => {
@@ -104,23 +104,32 @@ function updateBoard() {
             const cell = document.createElement("div");
             cell.className = "cell";
 
-            if (board[i][j] === "") {
-                cell.textContent = `${linhas[i]}-${j + 1}`;
-                cell.style.color = "rgba(0,0,0,0.3)";
-                cell.style.fontSize = "28px";
-                cell.style.fontWeight = "bold";
-            } else {
-                cell.textContent = board[i][j];
-                cell.style.fontSize = "72px";
-                cell.style.fontWeight = "normal";
-                cell.style.color = board[i][j] === "O" ? "#007bff" : "#ff3333";
+            const inner = document.createElement("div");
+            inner.className = "cell-inner";
+
+            const front = document.createElement("div");
+            front.className = "cell-front";
+            front.textContent = `${linhas[i]}-${j + 1}`;
+
+            const back = document.createElement("div");
+            back.className = "cell-back";
+            if (board[i][j] !== "") {
+                back.textContent = board[i][j];
+                back.style.color = board[i][j] === "O" ? "#007bff" : "#ff3333";
+                cell.classList.add("flipped");
             }
+
+            inner.appendChild(front);
+            inner.appendChild(back);
+            cell.appendChild(inner);
 
             cell.onclick = () => jogar(i, j);
             boardDiv.appendChild(cell);
         }
     }
 }
+
+
 
 function jogar(i, j) {
     if (!jogoIniciado) {
@@ -129,10 +138,19 @@ function jogar(i, j) {
     }
     if (board[i][j] !== "") return;
 
+    // marca no board lógico
     board[i][j] = currentPlayerIndex === 0 ? "O" : "X";
     moves++;
-    updateBoard();
 
+    // atualiza apenas a célula clicada com efeito de flip
+    const index = i * 3 + j;
+    const cell = document.querySelectorAll('.cell')[index];
+    const back = cell.querySelector('.cell-back');
+    back.textContent = board[i][j];
+    back.style.color = board[i][j] === "O" ? "#007bff" : "#ff3333";
+    cell.classList.add('flipped');
+
+    // checa vencedor
     if (checkWinner()) {
         const vencedorIdx = currentPlayers[currentPlayerIndex];
         const perdedorIdx = currentPlayers[1 - currentPlayerIndex];
@@ -182,6 +200,7 @@ function jogar(i, j) {
 
     updateScoreboard();
 }
+
 
 function checkWinner() {
     const b = board;
@@ -265,37 +284,50 @@ function updateScoreboard() {
     const table = document.getElementById('ranking-table');
     if (!table) return;
 
-    // limpa a tabela
     table.innerHTML = '';
 
-    // cabeçalho
+    const isMobile = window.innerWidth <= 480;
+
     const thead = document.createElement('thead');
     const headRow = document.createElement('tr');
-    ['Posição', 'Jogador', 'Vitórias', 'Empates', 'Derrotas', 'Jogos', 'Pontos'].forEach(h => {
-        const th = document.createElement('th');
-        th.textContent = h;
-        headRow.appendChild(th);
-    });
+
+    if (isMobile) {
+        ['Pos', 'Jog', 'V', 'E', 'D', 'J', 'Pts'].forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            headRow.appendChild(th);
+        });
+    } else {
+        ['Posição', 'Jogador', 'Vitórias', 'Empates', 'Derrotas', 'Jogos', 'Pontos'].forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            headRow.appendChild(th);
+        });
+    }
+
     thead.appendChild(headRow);
     table.appendChild(thead);
 
-    // corpo
     const tbody = document.createElement('tbody');
+
     players.forEach((p, idx) => {
         const row = document.createElement('tr');
         if (idx === 0) row.classList.add('first-place');
+
         const games = (p.wins ?? 0) + (p.draws ?? 0) + (p.losses ?? 0);
         const pos = (idx + 1) + 'º';
+
         [pos, p.name, p.wins ?? 0, p.draws ?? 0, p.losses ?? 0, games, p.points ?? 0].forEach(val => {
             const td = document.createElement('td');
             td.textContent = val;
             row.appendChild(td);
         });
+
         tbody.appendChild(row);
     });
+
     table.appendChild(tbody);
 
-    // Reinicia o scroll se já estava rodando
     if (rankingInterval) clearInterval(rankingInterval);
     rankingScrollOffset = 0;
     tbody.style.transition = 'none';
@@ -304,17 +336,18 @@ function updateScoreboard() {
     iniciarScrollVertical();
 }
 
+
+
 function iniciarScrollVertical() {
     const tbody = document.querySelector('#ranking-table tbody');
     if (!tbody) return;
 
-    // interrompe qualquer animação anterior
+
     if (scrollAnimationFrame) {
         cancelAnimationFrame(scrollAnimationFrame);
         scrollAnimationFrame = null;
     }
 
-    // zera offset e pausa
     scrollOffset = 0;
     scrollPaused = false;
     tbody.style.transition = 'none';
@@ -322,18 +355,14 @@ function iniciarScrollVertical() {
 
     const rows = Array.from(tbody.querySelectorAll('tr'));
 
-    // se tiver 5 ou menos jogadores, não faz rolagem
     if (rows.length <= visibleRows) {
         return;
     }
 
-    // limpa duplicatas antigas (caso tenha rodado antes)
-    // mantém apenas as linhas originais:
     while (tbody.children.length > rows.length) {
         tbody.removeChild(tbody.lastChild);
     }
 
-    // duplica as linhas originais uma única vez
     rows.forEach(row => {
         const clone = row.cloneNode(true);
         tbody.appendChild(clone);
@@ -341,7 +370,7 @@ function iniciarScrollVertical() {
 
     const totalHeight = rows.length * rowHeight;
 
-    // função de animação
+
     function animateScroll() {
         if (!scrollPaused) {
             scrollOffset += scrollSpeed;
@@ -367,16 +396,12 @@ function iniciarScrollVertical() {
 
 function zerarRanking() {
     if (confirm("Tem certeza que deseja zerar TODO o ranking (jogadores e pontos)?")) {
-        // limpa completamente o array de jogadores
         players = [];
 
-        // limpa o líder
         rankingLeader = { name: "", since: "" };
 
-        // salva estado vazio no localStorage
         salvarRanking();
 
-        // atualiza a tabela e outros elementos
         updateScoreboard();
         resetBoard();
         updateBoard();

@@ -98,6 +98,56 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
+    .cell {
+        position: relative;
+        perspective: 600px;
+        /* dá o efeito 3D */
+        overflow: hidden;
+        /* evita vazamento */
+    }
+
+    /* conteiner interno que vai girar */
+    .cell-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s ease;
+        transform-style: preserve-3d;
+    }
+
+    /* frente e verso */
+    .cell-front,
+    .cell-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: clamp(32px, 8vw, 72px);
+    }
+
+    /* frente: mostra o A-1, A-2 etc */
+    .cell-front {
+        color: rgba(0, 0, 0, 0.3);
+        font-size: 28px;
+    }
+
+    /* verso: mostra X ou O */
+    .cell-back {
+        transform: rotateY(180deg);
+        background: transparent;
+        /* a célula já tem o fundo */
+        color: #333;
+    }
+
+    /* quando virar */
+    .cell.flipped .cell-inner {
+        transform: rotateY(180deg);
+    }
+
     button {
         padding: 12px 24px;
         font-size: clamp(14px, 2.5vw, 20px);
@@ -157,6 +207,7 @@
         overflow: hidden;
         position: relative;
         width: 100%;
+        max-width: 100%;
 
     }
 
@@ -183,28 +234,37 @@
         display: table;
         width: 100%;
         table-layout: fixed;
+        height: 35px;
     }
 
     #ranking-table tbody {
         display: block;
+        width: 100%;
         transition: transform 0.5s ease;
     }
 
     #ranking-table thead {
         width: 100%;
         table-layout: fixed;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #444;
+        display: table;
     }
 
     #ranking-table tr {
         height: 35px;
-        /* precisa combinar com rowHeight no JS */
     }
 
     #ranking-table td {
         border: 0.5px solid #666;
         height: 40px;
-        padding: 3px 2px;
+        padding: 2px 2px;
         text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     #ranking-table th,
@@ -223,6 +283,12 @@
     #ranking-table th {
         background: #444;
         color: #d3b405;
+        padding: 4px;
+        border: 0.1px solid #636060;
+        text-align: center;
+        font-weight: bold;
+        font-size: 13px;
+        white-space: nowrap;
     }
 
     #ranking-table tbody tr:hover {
@@ -264,4 +330,45 @@
 
     .footer span {
         white-space: nowrap;
+    }
+
+    #ranking-table {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #ranking-table th,
+    #ranking-table td {
+        padding: 2px;
+        font-size: 12px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #ranking-table th:nth-child(2),
+    #ranking-table td:nth-child(2) {
+        width: 35%;
+    }
+
+    #ranking-table td:nth-child(1),
+    #ranking-table th:nth-child(1) {
+        color: #ffd700cc;
+        font-weight: bold;
+    }
+
+    @media (max-width: 1024px) {
+
+        #ranking-table th,
+        #ranking-table td {
+            font-size: 11px;
+
+            padding: 1px;
+        }
+
+        #ranking-table th:nth-child(2),
+        #ranking-table td:nth-child(2) {
+            width: 40%;
+        }
+
     }
