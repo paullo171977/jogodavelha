@@ -1,194 +1,267 @@
-body {
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #6dd5ed, #2193b0);
-    color: #fff;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.container {
-    flex: 1;
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 40px;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-    box-sizing: border-box;
-}
-
-.game-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1 1 280px;
-}
-
-h1 {
-    margin: 0 0 10px;
-    font-size: clamp(24px, 5vw, 48px);
-    text-align: center;
-}
-
-#aviso {
-    margin-bottom: 20px;
-    font-size: clamp(16px, 3vw, 22px);
-    font-weight: bold;
-    color: #333a;
-    text-align: center;
-}
-
-#board {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(80px, 140px));
-    gap: 8px;
-    column-gap: 16px;
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 420px;
-}
-
-.cell {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background: #fff;
-    color: #333;
-    font-size: clamp(32px, 8vw, 72px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: 4px solid #333;
-    border-radius: 8px;
-    user-select: none;
-    transition: background 0.2s ease;
-}
-
-.cell:hover {
-    background: #f0f0f0;
-}
-
-button {
-    padding: 12px 24px;
-    font-size: clamp(14px, 2.5vw, 20px);
-    border: none;
-    border-radius: 5px;
-    background: #ff9800;
-    color: #fff;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-button:hover {
-    background: #e68900;
-}
-
-#jogadoresAtuais {
-    margin-top: 10px;
-    font-size: clamp(16px, 3vw, 20px);
-    font-weight: bold;
-    text-align: center;
-}
-
-.scoreboard {
-    min-width: 280px;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #fff;
-    flex: 1 1 280px;
-}
-
-.scoreboard h2 {
-    text-align: center;
-    font-size: clamp(20px, 4vw, 32px);
-    margin-bottom: 15px;
-    color: #ffd700;
-    text-shadow: 0 0 6px #ffd700aa;
-}
-
-.score-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: clamp(12px, 2vw, 16px);
-}
-
-.score-table thead tr {
-    background: #333333cc;
-}
-
-.score-table th,
-.score-table td {
-    padding: 8px 4px;
-    border: 1px solid #555;
-    text-align: center;
-    font-weight: 600;
-}
-
-.score-table th {
-    background: #444;
-}
-
-.score-table tbody tr:hover {
-    background: rgba(255, 215, 0, 0.2);
-}
-
-.score-table tbody tr.first-place {
-    color: #ffd700;
-    font-weight: bold;
-    text-shadow: 0 0 4px #ffd700cc;
-    background: rgba(255, 215, 0, 0.15);
-}
-
-#leader-info {
-    margin-bottom: 12px;
-    font-size: clamp(14px, 2vw, 18px);
-    font-weight: bold;
-    text-align: center;
-    color: #ffd700;
-    text-shadow: 0 0 6px #ffd700cc;
-}
-
-
-@media (max-width: 1024px) {
-    .container {
+    body {
+        height: 100%;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #6dd5ed, #2193b0);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
         flex-direction: column;
-        gap: 20px;
-        align-items: center;
     }
-}
 
-#board {
-    grid-template-columns: repeat(3, minmax(60px, 25vw));
-    max-width: 90vw;
-}
+    .container {
+        flex: 1;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 40px;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
 
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 18px;
-    font-size: 12px;
-    color: rgb(124, 121, 121);
-    background: rgba(255, 255, 255, 0.2);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    width: 100%;
-    box-sizing: border-box;
-}
+    .game-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1 1 280px;
+    }
 
-.footer span {
-    white-space: nowrap;
-}
+    h1 {
+        margin: 0 0 10px;
+        font-size: clamp(24px, 5vw, 48px);
+        text-align: center;
+    }
+
+    #aviso {
+        margin-bottom: 20px;
+        font-size: clamp(16px, 3vw, 22px);
+        font-weight: bold;
+        color: #333a;
+        text-align: center;
+    }
+
+    #board {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(80px, 140px));
+        gap: 8px;
+        column-gap: 16px;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .board-container {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+        max-width: 460px;
+        width: 100%;
+    }
+
+    .board-container button {
+        margin-top: 10px;
+    }
+
+    .board-container #jogadoresAtuais {
+        margin-top: 8px;
+    }
+
+    .cell {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #fff;
+        color: #333;
+        font-size: clamp(32px, 8vw, 72px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border: 4px solid rgba(0, 0, 0, 0.4);
+        border-radius: 12px;
+        user-select: none;
+        transition: background 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .cell:hover {
+        background: #f0f0f0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    button {
+        padding: 12px 24px;
+        font-size: clamp(14px, 2.5vw, 20px);
+        border: none;
+        border-radius: 5px;
+        background: #ff9800;
+        color: #fff;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background: #e68900;
+    }
+
+    #jogadoresAtuais {
+        margin-top: 10px;
+        font-size: clamp(16px, 3vw, 20px);
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .scoreboard {
+        min-width: 280px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #fff;
+        flex: 1 1 280px;
+    }
+
+    .scoreboard h2 {
+        text-align: center;
+        font-size: clamp(20px, 4vw, 32px);
+        margin-bottom: 15px;
+        color: #ffd700;
+        text-shadow: 0 0 6px #ffd700aa;
+    }
+
+    #leader-info {
+        margin-bottom: 12px;
+        font-size: clamp(14px, 2vw, 18px);
+        font-weight: bold;
+        text-align: center;
+        color: #ffd700;
+        text-shadow: 0 0 6px #ffd700cc;
+    }
+
+    #ranking-wrapper {
+        height: 214px;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+
+    }
+
+    #ranking-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        table-layout: fixed;
+    }
+
+    #ranking-table thead tr {
+        background-color: #444;
+        color: #ffd700;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+
+
+    #ranking-table thead,
+    #ranking-table tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    #ranking-table tbody {
+        display: block;
+        transition: transform 0.5s ease;
+    }
+
+    #ranking-table thead {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    #ranking-table tr {
+        height: 35px;
+        /* precisa combinar com rowHeight no JS */
+    }
+
+    #ranking-table td {
+        border: 0.5px solid #666;
+        height: 40px;
+        padding: 3px 2px;
+        text-align: center;
+    }
+
+    #ranking-table th,
+    #ranking-table td {
+        padding: 1px 1px;
+        border: 0.1px solid #636060;
+        text-align: center;
+        color: #fff;
+        height: 32px;
+        box-sizing: border-box;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.1);
+        box-sizing: border-box;
+    }
+
+    #ranking-table th {
+        background: #444;
+        color: #d3b405;
+    }
+
+    #ranking-table tbody tr:hover {
+        background: rgba(255, 215, 0, 0.2);
+    }
+
+    #ranking-table tbody tr.first-place {
+        color: #ffd700;
+        font-weight: bold;
+        text-shadow: 0 0 4px #ffd700cc;
+        background: rgba(255, 215, 0, 0.15);
+    }
+
+    @media (max-width: 1024px) {
+        .container {
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+    }
+
+    #board {
+        grid-template-columns: repeat(3, minmax(60px, 25vw));
+        max-width: 90vw;
+    }
+
+    .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 12px;
+        font-size: 11px;
+        color: #7c7979;
+        background: rgba(255, 255, 255, 0.15);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .footer span {
+        white-space: nowrap;
+    }

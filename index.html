@@ -14,20 +14,28 @@
     <div class="game-area">
       <h1>Jogo da Velha</h1>
       <div id="aviso">Clique em Iniciar</div>
-      <div id="board"></div>
-      <button id="btnIniciar" onclick="iniciar()">Iniciar / Reiniciar</button>
-      <div id="jogadoresAtuais"></div>
+      <div class="board-container">
+        <div id="board"></div>
+        <button id="btnIniciar" onclick="iniciar()">Iniciar</button>
+        <div id="jogadoresAtuais"></div>
+      </div>
     </div>
+
     <div class="scoreboard">
       <h2>🏆 Ranking</h2>
       <div id="leader-info"></div>
-      <div id="scoreboard"></div>
-      <button id="btnZerar" onclick="zerarRanking()">Zerar Ranking</button>
+      <div id="ranking-wrapper">
+        <table class="score-table" id="ranking-table">
+        </table>
+      </div>
+
+      <button id="btnZerar" onclick="zerarRanking()">Zerar Pontuação</button>
     </div>
   </div>
+
   <footer class="footer">
-    <span>© Criado por: Paulo e ChatGPT</span>
-    <span>Versão: 1.0.1</span>
+    <span class="footer-left">© Criado por: Paulo e ChatGPT</span>
+    <span class="footer-right">Versão: 1.0.1</span>
   </footer>
 </body>
 

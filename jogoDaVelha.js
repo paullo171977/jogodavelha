@@ -6,6 +6,15 @@ let moves = 0;
 let jogoIniciado = false;
 let ultimoJogadorInicial = 0;
 let rankingLeader = { name: "", since: "" };
+let rankingInterval = null;
+let rankingScrollOffset = 0;
+let scrollOffset = 0;
+let scrollPaused = false;
+let scrollSpeed = 0.8; // pixels por frame (ajuste para mais rápido ou mais lento)
+let visibleRows = 5;
+let rowHeight = 35; // altura da linha (ajuste ao seu CSS)
+let pauseTime = 5000; // pausa de 10 segundos
+let scrollAnimationFrame;
 
 window.addEventListener('load', () => {
     const savedPlayers = localStorage.getItem('jogoVelhaRanking');
@@ -253,76 +262,100 @@ function updateJogadoresAtuais() {
 }
 
 function updateScoreboard() {
-    const scoreDiv = document.getElementById("scoreboard");
-    const leaderDiv = document.getElementById("leader-info");
-    if (leaderDiv) leaderDiv.innerHTML = "";
-    scoreDiv.innerHTML = "";
+    const table = document.getElementById('ranking-table');
+    if (!table) return;
 
-    players.sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        const aGames = (a.wins ?? 0) + (a.draws ?? 0) + (a.losses ?? 0);
-        const bGames = (b.wins ?? 0) + (b.draws ?? 0) + (b.losses ?? 0);
-        if (aGames !== bGames) return aGames - bGames;
-        if (b.wins !== a.wins) return b.wins - a.wins;
-        return a.name.localeCompare(b.name);
-    });
+    // limpa a tabela
+    table.innerHTML = '';
 
-    if (players.length > 0) {
-        const topScore = players[0].points;
-        const empatados = players.filter(p => p.points === topScore);
-        if (empatados.length === 1) {
-            if (rankingLeader.name !== empatados[0].name) {
-                rankingLeader.name = empatados[0].name;
-                rankingLeader.since = new Date().toLocaleDateString("pt-BR");
-                salvarRanking();
-            }
-        }
-    }
-
-    if (rankingLeader.name && leaderDiv) {
-        leaderDiv.innerHTML = `🏅 <strong>${rankingLeader.name}</strong> está em primeiro desde <strong>${rankingLeader.since}</strong>`;
-    }
-
-    const table = document.createElement("table");
-    table.className = "score-table";
-    const thead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-    ["Jogador", "Vitórias", "Empates", "Derrotas", "Jogos", "Pontos"].forEach(h => {
-        const th = document.createElement("th");
+    // cabeçalho
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    ['Posição', 'Jogador', 'Vitórias', 'Empates', 'Derrotas', 'Jogos', 'Pontos'].forEach(h => {
+        const th = document.createElement('th');
         th.textContent = h;
-        headerRow.appendChild(th);
+        headRow.appendChild(th);
     });
-    thead.appendChild(headerRow);
+    thead.appendChild(headRow);
     table.appendChild(thead);
 
-    const tbody = document.createElement("tbody");
-    players.forEach((p, i) => {
-        const row = document.createElement("tr");
-        if (i === 0) row.classList.add("first-place");
+    // corpo
+    const tbody = document.createElement('tbody');
+    players.forEach((p, idx) => {
+        const row = document.createElement('tr');
+        if (idx === 0) row.classList.add('first-place');
         const games = (p.wins ?? 0) + (p.draws ?? 0) + (p.losses ?? 0);
-        [p.name, p.wins ?? 0, p.draws ?? 0, p.losses ?? 0, games, p.points ?? 0].forEach(val => {
-            const td = document.createElement("td");
+        const pos = (idx + 1) + 'º';
+        [pos, p.name, p.wins ?? 0, p.draws ?? 0, p.losses ?? 0, games, p.points ?? 0].forEach(val => {
+            const td = document.createElement('td');
             td.textContent = val;
             row.appendChild(td);
         });
         tbody.appendChild(row);
     });
-
     table.appendChild(tbody);
-    scoreDiv.appendChild(table);
+
+    // Reinicia o scroll se já estava rodando
+    if (rankingInterval) clearInterval(rankingInterval);
+    rankingScrollOffset = 0;
+    tbody.style.transition = 'none';
+    tbody.style.transform = `translateY(0px)`;
+
+    iniciarScrollVertical();
+}
+
+function iniciarScrollVertical() {
+    const tbody = document.querySelector('#ranking-table tbody');
+    if (!tbody) return;
+
+    // 🛠️ Duplicar o conteúdo para criar o efeito de rolo infinito
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.forEach(row => {
+        const clone = row.cloneNode(true);
+        tbody.appendChild(clone);
+    });
+
+    // Iniciar loop de animação
+    function animateScroll() {
+        if (!scrollPaused) {
+            scrollOffset += scrollSpeed;
+            tbody.style.transform = `translateY(-${scrollOffset}px)`;
+
+            // Altura total do bloco original
+            const totalHeight = rows.length * rowHeight;
+
+            if (scrollOffset >= totalHeight) {
+                // reinicia o offset quando terminar o ciclo completo
+                scrollOffset = 0;
+                tbody.style.transform = `translateY(0px)`;
+
+                // pausa de 10s quando volta ao início
+                scrollPaused = true;
+                setTimeout(() => {
+                    scrollPaused = false;
+                }, pauseTime);
+            }
+        }
+
+        scrollAnimationFrame = requestAnimationFrame(animateScroll);
+    }
+
+    animateScroll();
 }
 
 function zerarRanking() {
-    if (confirm("Tem certeza que deseja zerar o ranking?")) {
-        players = [];
+    if (confirm("Tem certeza que deseja zerar apenas os pontos do ranking?")) {
+        players.forEach(p => {
+            p.wins = 0;
+            p.draws = 0;
+            p.losses = 0;
+            p.points = 0;
+            p.firstScoreDate = "";
+        });
+
         rankingLeader = { name: "", since: "" };
         salvarRanking();
         updateScoreboard();
-
-        currentPlayers = [];
-        ultimoJogadorInicial = 0;
-        currentPlayerIndex = 0;
-        jogoIniciado = false;
 
         resetBoard();
         updateBoard();
