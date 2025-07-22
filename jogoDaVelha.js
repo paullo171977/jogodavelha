@@ -119,7 +119,7 @@ function selecionarDificuldade() {
     const botao = document.getElementById('btnBot');
 
     if (select.value === "") {
-        botao.textContent = "Jogar contra o Bot (desativado)";
+        botao.textContent = "Bot (desativado)";
         botao.disabled = true;
     } else {
         botao.textContent = `Dificuldade: ${select.value}`;
@@ -472,7 +472,23 @@ function iniciarNovaPartidaMesmos() {
     updateAviso();
     jogoIniciado = true;
     updateBotoes();
+
+    const dificuldade = document.getElementById('dificuldades').value;
+    if (currentPlayerIndex === 1 && dificuldade !== "") {
+        switch (dificuldade) {
+            case "Fácil":
+                setTimeout(botFacil, 300);
+                break;
+            case "Médio":
+                setTimeout(botMedio, 300);
+                break;
+            case "Difícil":
+                setTimeout(botDificil, 300);
+                break;
+        }
+    }
 }
+
 
 function updateAviso() {
     const aviso = document.getElementById("aviso");
