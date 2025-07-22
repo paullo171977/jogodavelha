@@ -13,9 +13,16 @@
   <div class="container">
     <div class="game-area">
       <h1>Jogo da Velha</h1>
+      <select id="dificuldades" onchange="selecionarDificuldade()">
+        <option value="">Jogar contra Bot</option>
+        <option value="Fácil">Bot: Fácil</option>
+        <option value="Médio">Bot: Médio</option>
+        <option value="Difícil">Bot: Difícil</option>
+      </select>
       <div id="aviso">Clique em Iniciar</div>
       <div class="board-container">
         <div id="board"></div>
+        <div id="linha-risco"></div>
         <button id="btnIniciar" onclick="iniciar()">Iniciar</button>
         <div id="jogadoresAtuais"></div>
       </div>
@@ -35,7 +42,7 @@
 
   <footer class="footer">
     <span class="footer-left">© Criado por: Paulo e ChatGPT</span>
-    <span class="footer-right">Versão: 1.1.5</span>
+    <span class="footer-right">Versão: 1.2.0</span>
   </footer>
 </body>
 

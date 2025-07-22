@@ -15,6 +15,117 @@ let visibleRows = 5;
 let rowHeight = 35;
 let pauseTime = 5000;
 let scrollAnimationFrame;
+let linhaVencedora = null;
+
+function botFacil() {
+    let livres = [];
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (board[i][j] === "") {
+                livres.push({ i, j });
+            }
+        }
+    }
+
+    if (livres.length > 0) {
+        const escolha = livres[Math.floor(Math.random() * livres.length)];
+
+        jogar(escolha.i, escolha.j);
+    }
+}
+
+function botMedio() {
+    const botSimbolo = currentPlayers[1] !== undefined ? (currentPlayerIndex === 1 ? "X" : "O") : "X";
+    const humanoSimbolo = botSimbolo === "X" ? "O" : "X";
+
+    let jogada = podeGanhar(board, botSimbolo);
+    if (jogada) {
+        jogar(jogada.i, jogada.j);
+        return;
+    }
+
+    jogada = podeGanhar(board, humanoSimbolo);
+    if (jogada) {
+        jogar(jogada.i, jogada.j);
+        return;
+    }
+
+    botFacil();
+}
+
+
+function botDificil() {
+    const botSimbolo = currentPlayers[1] !== undefined ? players[currentPlayers[1]].simbolo || "X" : "X";
+    const humanoSimbolo = currentPlayers[0] !== undefined ? players[currentPlayers[0]].simbolo || "O" : "O";
+
+    let jogada = podeGanhar(board, botSimbolo);
+    if (jogada) {
+        jogar(jogada.i, jogada.j);
+        return;
+    }
+
+
+    jogada = podeGanhar(board, humanoSimbolo);
+    if (jogada) {
+        jogar(jogada.i, jogada.j);
+        return;
+    }
+
+    const cantos = [{ i: 0, j: 0 }, { i: 0, j: 2 }, { i: 2, j: 0 }, { i: 2, j: 2 }];
+    for (const pos of cantos) {
+        if (board[pos.i][pos.j] === "") {
+            jogar(pos.i, pos.j);
+            return;
+        }
+    }
+
+    if (board[1][1] === "") {
+        jogar(1, 1);
+        return;
+    }
+
+
+    const laterais = [{ i: 0, j: 1 }, { i: 1, j: 0 }, { i: 1, j: 2 }, { i: 2, j: 1 }];
+    for (const pos of laterais) {
+        if (board[pos.i][pos.j] === "") {
+            jogar(pos.i, pos.j);
+            return;
+        }
+    }
+
+    botFacil();
+}
+
+
+function podeGanhar(board, simbolo) {
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (board[i][j] === "") {
+                board[i][j] = simbolo;
+                if (checkWinner()) {
+                    board[i][j] = "";
+                    return { i, j };
+                }
+                board[i][j] = "";
+            }
+        }
+    }
+    return null;
+}
+
+
+function selecionarDificuldade() {
+    const select = document.getElementById('dificuldades');
+    const botao = document.getElementById('btnBot');
+
+    if (select.value === "") {
+        botao.textContent = "Jogar contra o Bot (desativado)";
+        botao.disabled = true;
+    } else {
+        botao.textContent = `Dificuldade: ${select.value}`;
+        botao.disabled = false;
+    }
+}
 
 window.addEventListener('load', () => {
     const savedPlayers = localStorage.getItem('jogoVelhaRanking');
@@ -37,14 +148,18 @@ window.addEventListener('load', () => {
     updateBoard();
     updateBotoes();
     updateJogadoresAtuais();
+
+    selecionarDificuldade();
 });
 
 function updateBotoes() {
     const btnIniciar = document.getElementById("btnIniciar");
     const btnZerar = document.getElementById("btnZerar");
-    if (!btnIniciar || !btnZerar) return;
+    const btndificuldade = document.getElementById("dificuldades");
+    if (!btnIniciar || !btnZerar || !btndificuldade) return;
     btnIniciar.disabled = jogoIniciado;
     btnZerar.disabled = jogoIniciado;
+    btndificuldade.disabled = jogoIniciado;
 }
 
 function salvarRanking() {
@@ -61,8 +176,28 @@ function recalcularEstatisticas() {
 function iniciar() {
     const nome1 = prompt("Nome do primeiro jogador:");
     if (!nome1) return;
-    const nome2 = prompt("Nome do segundo jogador:");
-    if (!nome2) return;
+
+    const dificuldade = document.getElementById('dificuldades').value;
+    let nome2;
+
+    if (dificuldade !== "") {
+        switch (dificuldade) {
+            case "Fácil":
+                nome2 = "Bot Fácil";
+                break;
+            case "Médio":
+                nome2 = "Bot Médio";
+                break;
+            case "Difícil":
+                nome2 = "Bot Difícil";
+                break;
+            default:
+                nome2 = "Bot";
+        }
+    } else {
+        nome2 = prompt("Nome do segundo jogador:");
+        if (!nome2) return;
+    }
 
     addOrFindPlayer(nome1);
     addOrFindPlayer(nome2);
@@ -77,6 +212,7 @@ function iniciar() {
     updateJogadoresAtuais();
     updateAviso();
 }
+
 
 function addOrFindPlayer(name) {
     let idx = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
@@ -113,10 +249,17 @@ function updateBoard() {
 
             const back = document.createElement("div");
             back.className = "cell-back";
+
             if (board[i][j] !== "") {
                 back.textContent = board[i][j];
                 back.style.color = board[i][j] === "O" ? "#007bff" : "#ff3333";
-                cell.classList.add("flipped");
+
+                if (linhaVencedora && linhaVencedora.some(pos => pos.i === i && pos.j === j)) {
+                    cell.classList.add("flipped");
+                    cell.classList.add("vencedora");
+                } else {
+                    cell.classList.add("flipped");
+                }
             }
 
             inner.appendChild(front);
@@ -130,7 +273,6 @@ function updateBoard() {
 }
 
 
-
 function jogar(i, j) {
     if (!jogoIniciado) {
         alert("Clique em Iniciar primeiro!");
@@ -138,20 +280,26 @@ function jogar(i, j) {
     }
     if (board[i][j] !== "") return;
 
-    // marca no board lógico
     board[i][j] = currentPlayerIndex === 0 ? "O" : "X";
     moves++;
 
-    // atualiza apenas a célula clicada com efeito de flip
-    const index = i * 3 + j;
-    const cell = document.querySelectorAll('.cell')[index];
-    const back = cell.querySelector('.cell-back');
-    back.textContent = board[i][j];
-    back.style.color = board[i][j] === "O" ? "#007bff" : "#ff3333";
-    cell.classList.add('flipped');
+    updateBoard();
 
-    // checa vencedor
-    if (checkWinner()) {
+    linhaVencedora = checkWinner();
+
+    if (linhaVencedora) {
+
+        const [a, b, c] = linhaVencedora;
+        if (a.i === b.i && b.i === c.i) {
+            desenharLinhaRisco('horizontal', a.i);
+        } else if (a.j === b.j && b.j === c.j) {
+            desenharLinhaRisco('vertical', a.j);
+        } else if (a.i === 0 && a.j === 0 && c.i === 2 && c.j === 2) {
+            desenharLinhaRisco('diagonal-principal');
+        } else {
+            desenharLinhaRisco('diagonal-secundaria');
+        }
+
         const vencedorIdx = currentPlayers[currentPlayerIndex];
         const perdedorIdx = currentPlayers[1 - currentPlayerIndex];
 
@@ -172,6 +320,9 @@ function jogar(i, j) {
         setTimeout(() => {
             alert(players[vencedorIdx].name + " venceu!");
             proximaRodada(true);
+            linhaVencedora = null;
+
+            document.getElementById('linha-risco').style.display = 'none';
         }, 0);
 
     } else if (moves === 9) {
@@ -185,6 +336,9 @@ function jogar(i, j) {
         updateAviso();
         updateBotoes();
 
+        linhaVencedora = null;
+        document.getElementById('linha-risco').style.display = 'none';
+
         setTimeout(() => {
             alert("Empate! Ambos ganharam 1 ponto.");
             ultimoJogadorInicial = 1 - ultimoJogadorInicial;
@@ -196,22 +350,82 @@ function jogar(i, j) {
     } else {
         currentPlayerIndex = 1 - currentPlayerIndex;
         updateAviso();
+
+        linhaVencedora = null;
+        document.getElementById('linha-risco').style.display = 'none';
+
+        const dificuldade = document.getElementById('dificuldades').value;
+        if (jogoIniciado && currentPlayerIndex === 1) {
+            switch (dificuldade) {
+                case "Fácil":
+                    setTimeout(botFacil, 300);
+                    break;
+                case "Médio":
+                    setTimeout(botMedio, 300);
+                    break;
+                case "Difícil":
+                    setTimeout(botDificil, 300);
+                    break;
+            }
+        }
     }
 
     updateScoreboard();
 }
 
 
+function mostrarLinhaVencedora() {
+    const linhaRisco = document.getElementById('linha-risco');
+    if (!linhaVencedora) {
+        linhaRisco.style.display = 'none';
+        return;
+    }
+
+    linhaRisco.style.display = 'block';
+
+    const tamanhoCelula = 100;
+    const pos0 = linhaVencedora[0];
+    const pos2 = linhaVencedora[2];
+
+    const x1 = pos0.j * tamanhoCelula + tamanhoCelula / 2;
+    const y1 = pos0.i * tamanhoCelula + tamanhoCelula / 2;
+
+    const x2 = pos2.j * tamanhoCelula + tamanhoCelula / 2;
+    const y2 = pos2.i * tamanhoCelula + tamanhoCelula / 2;
+
+    const comprimento = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+
+    const angulo = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+    linhaRisco.style.width = comprimento + 'px';
+    linhaRisco.style.top = y1 + 'px';
+    linhaRisco.style.left = x1 + 'px';
+    linhaRisco.style.transform = `rotate(${angulo}deg)`;
+}
+
 function checkWinner() {
     const b = board;
+
     for (let i = 0; i < 3; i++) {
-        if (b[i][0] && b[i][0] === b[i][1] && b[i][1] === b[i][2]) return true;
-        if (b[0][i] && b[0][i] === b[1][i] && b[1][i] === b[2][i]) return true;
+        if (b[i][0] && b[i][0] === b[i][1] && b[i][1] === b[i][2]) {
+            return [{ i, j: 0 }, { i, j: 1 }, { i, j: 2 }];
+        }
     }
-    if (b[0][0] && b[0][0] === b[1][1] && b[1][1] === b[2][2]) return true;
-    if (b[0][2] && b[0][2] === b[1][1] && b[1][1] === b[2][0]) return true;
-    return false;
+    for (let j = 0; j < 3; j++) {
+        if (b[0][j] && b[0][j] === b[1][j] && b[1][j] === b[2][j]) {
+            return [{ i: 0, j }, { i: 1, j }, { i: 2, j }];
+        }
+    }
+    if (b[0][0] && b[0][0] === b[1][1] && b[1][1] === b[2][2]) {
+        return [{ i: 0, j: 0 }, { i: 1, j: 1 }, { i: 2, j: 2 }];
+    }
+    if (b[0][2] && b[0][2] === b[1][1] && b[1][1] === b[2][0]) {
+        return [{ i: 0, j: 2 }, { i: 1, j: 1 }, { i: 2, j: 0 }];
+    }
+
+    return null;
 }
+
 
 function proximaRodada(venceu) {
     if (venceu) {
@@ -390,6 +604,51 @@ function iniciarScrollVertical() {
     }
 
     animateScroll();
+}
+
+function desenharLinhaRisco(tipo, indice) {
+    const linha = document.getElementById('linha-risco');
+    const board = document.getElementById('board');
+    const boardRect = board.getBoundingClientRect();
+    const cellSize = boardRect.width / 3;
+
+    const ajusteX = 5;
+    const ajusteY = 0;
+
+    linha.style.display = 'block';
+    linha.style.transformOrigin = 'left top';
+    linha.style.transform = 'none';
+    linha.style.width = `${boardRect.width}px`;
+
+    let x = 0;
+    let y = 0;
+    let angle = 0;
+
+    if (tipo === 'horizontal') {
+        y = (indice + 0.5) * cellSize;
+        x = 0;
+        angle = 0;
+    } else if (tipo === 'vertical') {
+        x = (indice + 0.5) * cellSize;
+        y = 0;
+        angle = 90;
+    } else if (tipo === 'diagonal-principal') {
+        x = 0;
+        y = 0;
+        angle = 45;
+        linha.style.width = `${Math.sqrt(2) * boardRect.width}px`;
+    } else if (tipo === 'diagonal-secundaria') {
+        x = boardRect.width;
+        y = 0;
+        angle = -45;
+        linha.style.width = `${Math.sqrt(2) * boardRect.width}px`;
+        linha.style.transformOrigin = 'right top';
+    }
+
+
+    linha.style.top = `${y + ajusteY}px`;
+    linha.style.left = `${x + ajusteX}px`;
+    linha.style.transform = `rotate(${angle}deg)`;
 }
 
 
