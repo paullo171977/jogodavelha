@@ -514,6 +514,23 @@ function updateScoreboard() {
     const table = document.getElementById('ranking-table');
     if (!table) return;
 
+    players.sort((a, b) => {
+
+        if (b.points !== a.points) return b.points - a.points;
+
+
+        const jogosA = (a.wins ?? 0) + (a.draws ?? 0) + (a.losses ?? 0);
+        const jogosB = (b.wins ?? 0) + (b.draws ?? 0) + (b.losses ?? 0);
+
+
+        if (jogosA !== jogosB) return jogosA - jogosB;
+
+        if (b.wins !== a.wins) return b.wins - a.wins;
+
+
+        return a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+    });
+
     table.innerHTML = '';
 
     const isMobile = window.innerWidth <= 480;
